@@ -178,7 +178,7 @@ async fn handle_chain_request(
         }
     };
 
-    if let Some(ref model) = req.model {
+    if let Some(model) = &req.model {
         let (provider_id, _) = model
             .split_once(':')
             .ok_or((StatusCode::BAD_REQUEST, "Invalid model format".to_string()))?;

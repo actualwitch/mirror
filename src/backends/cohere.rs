@@ -1,6 +1,7 @@
 //! Cohere API client implementation for chat and completion functionality.
 //!
 //! This module provides integration with Cohere's LLM models through their Compatibility API.
+use crate::constants::*;
 use std::time::Duration;
 
 #[cfg(feature = "cohere")]
@@ -54,52 +55,52 @@ pub struct Cohere {
 
 /// Individual message in a Cohere chat conversation.
 #[derive(Serialize, Debug)]
-struct CohereChatMessage<'a> {
+struct CohereChatMessage {
     #[allow(dead_code)]
-    role: &'a str,
+    role: String,
     #[serde(
         skip_serializing_if = "Option::is_none",
         with = "either::serde_untagged_optional"
     )]
-    content: Option<Either<Vec<CohereMessageContent<'a>>, String>>,
+    content: Option<Either<Vec<CohereMessageContent>, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tool_calls: Option<Vec<CohereFunctionCall<'a>>>,
+    tool_calls: Option<Vec<CohereFunctionCall>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_call_id: Option<String>,
 }
 
 #[derive(Serialize, Debug)]
-struct CohereFunctionPayload<'a> {
-    name: &'a str,
-    arguments: &'a str,
+struct CohereFunctionPayload {
+    name: String,
+    arguments: String,
 }
 
 #[derive(Serialize, Debug)]
-struct CohereFunctionCall<'a> {
-    id: &'a str,
+struct CohereFunctionCall {
+    id: String,
     #[serde(rename = "type")]
-    content_type: &'a str,
-    function: CohereFunctionPayload<'a>,
+    content_type: String,
+    function: CohereFunctionPayload,
 }
 
 #[derive(Serialize, Debug)]
-struct CohereMessageContent<'a> {
+struct CohereMessageContent {
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    message_type: Option<&'a str>,
+    message_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    text: Option<&'a str>,
+    text: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    image_url: Option<ImageUrlContent<'a>>,
+    image_url: Option<ImageUrlContent>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "tool_call_id")]
-    tool_call_id: Option<&'a str>,
+    tool_call_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "content")]
-    tool_output: Option<&'a str>,
+    tool_output: Option<String>,
 }
 
 /// Individual image message (URL) in a Cohere chat conversation.
 #[derive(Serialize, Debug)]
-struct ImageUrlContent<'a> {
-    url: &'a str,
+struct ImageUrlContent {
+    url: String,
 }
 
 #[derive(Serialize)]
@@ -114,9 +115,9 @@ struct CohereEmbeddingRequest {
 
 /// Request payload for Cohere's chat API endpoint.
 #[derive(Serialize, Debug)]
-struct CohereChatRequest<'a> {
-    model: &'a str,
-    messages: Vec<CohereChatMessage<'a>>,
+struct CohereChatRequest {
+    model: String,
+    messages: Vec<CohereChatMessage>,
     #[serde(skip_serializing_if = "Option::is_none")]
     max_tokens: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -226,9 +227,14 @@ impl ChatResponse for CohereChatResponse {
 
 impl std::fmt::Display for CohereChatResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let first_choice = match self.choices.first() {
+            Some(choice) => choice,
+            None => return write!(f, "{}", ERR_NO_RESPONSE_CHOICES),
+        };
+        
         match (
-            &self.choices.first().unwrap().message.content,
-            &self.choices.first().unwrap().message.tool_calls,
+            &first_choice.message.content,
+            &first_choice.message.tool_calls,
         ) {
             (Some(content), Some(tool_calls)) => {
                 for tool_call in tool_calls {
@@ -287,18 +293,23 @@ impl Cohere {
         tool_choice: Option<ToolChoice>,
         reasoning_effort: Option<String>,
         json_schema: Option<StructuredOutputFormat>,
-    ) -> Self {
+    ) -> Result<Self, LLMError> {
         let mut builder = Client::builder();
         if let Some(sec) = timeout_seconds {
             builder = builder.timeout(Duration::from_secs(sec));
         }
-        Self {
+        
+        let base_url_str = base_url.unwrap_or_else(|| DEFAULT_COHERE_BASE_URL.to_owned());
+        let base_url = Url::parse(&base_url_str)
+            .map_err(|e| LLMError::InvalidRequest(format!("Invalid base URL '{}': {}", base_url_str, e)))?;
+        
+        let client = builder.build()
+            .map_err(|e| LLMError::InvalidRequest(format!("Failed to build HTTP client: {}", e)))?;
+        
+        Ok(Self {
             api_key: api_key.into(),
-            base_url: Url::parse(
-                &base_url.unwrap_or_else(|| "https://api.cohere.ai/compatibility/v1/".to_owned()),
-            )
-            .expect("Failed to parse base Url"),
-            model: model.unwrap_or("command-light".to_string()),
+            base_url,
+            model: model.unwrap_or_else(|| DEFAULT_COHERE_MODEL.to_string()),
             max_tokens,
             temperature,
             system,
@@ -312,8 +323,8 @@ impl Cohere {
             embedding_dimensions,
             reasoning_effort,
             json_schema,
-            client: builder.build().expect("Failed to build reqwest Client"),
-        }
+            client,
+        })
     }
 }
 
@@ -333,11 +344,11 @@ impl ChatProvider for Cohere {
         let mut cohere_msgs: Vec<CohereChatMessage> = vec![];
 
         for msg in messages {
-            if let MessageType::ToolResult(ref results) = msg.message_type {
+            if let MessageType::ToolResult(results) = &msg.message_type {
                 // Include tool result as a message with role "tool"
                 for result in results {
                     cohere_msgs.push(CohereChatMessage {
-                        role: "tool",
+                        role: ROLE_TOOL.to_string(),
                         tool_call_id: Some(result.id.clone()),
                         tool_calls: None,
                         content: Some(Right(result.function.arguments.clone())),
@@ -353,10 +364,10 @@ impl ChatProvider for Cohere {
             cohere_msgs.insert(
                 0,
                 CohereChatMessage {
-                    role: "developer",
+                    role: ROLE_DEVELOPER.to_string(),
                     content: Some(Left(vec![CohereMessageContent {
-                        message_type: Some("text"),
-                        text: Some(system),
+                        message_type: Some(MESSAGE_TYPE_TEXT.to_string()),
+                        text: Some(system.clone()),
                         image_url: None,
                         tool_call_id: None,
                         tool_output: None,
@@ -378,7 +389,7 @@ impl ChatProvider for Cohere {
 
         // Build the request payload
         let body = CohereChatRequest {
-            model: &self.model,
+            model: self.model.clone(),
             messages: cohere_msgs,
             max_tokens: self.max_tokens,
             temperature: self.temperature,
@@ -449,10 +460,10 @@ impl ChatProvider for Cohere {
         let mut cohere_msgs: Vec<CohereChatMessage> = vec![];
 
         for msg in messages {
-            if let MessageType::ToolResult(ref results) = msg.message_type {
+            if let MessageType::ToolResult(results) = &msg.message_type {
                 for result in results {
                     cohere_msgs.push(CohereChatMessage {
-                        role: "tool",
+                        role: ROLE_TOOL.to_string(),
                         tool_call_id: Some(result.id.clone()),
                         tool_calls: None,
                         content: Some(Right(result.function.arguments.clone())),
@@ -466,10 +477,10 @@ impl ChatProvider for Cohere {
             cohere_msgs.insert(
                 0,
                 CohereChatMessage {
-                    role: "developer",
+                    role: ROLE_DEVELOPER.to_string(),
                     content: Some(Left(vec![CohereMessageContent {
-                        message_type: Some("text"),
-                        text: Some(system),
+                        message_type: Some(MESSAGE_TYPE_TEXT.to_string()),
+                        text: Some(system.clone()),
                         image_url: None,
                         tool_call_id: None,
                         tool_output: None,
@@ -481,7 +492,7 @@ impl ChatProvider for Cohere {
         }
 
         let body = CohereChatRequest {
-            model: &self.model,
+            model: self.model.clone(),
             messages: cohere_msgs,
             max_tokens: self.max_tokens,
             temperature: self.temperature,
@@ -511,29 +522,29 @@ impl ChatProvider for Cohere {
             });
         }
         // Return a Server-Sent Events stream of the response content
-        Ok(crate::chat::create_sse_stream(response, parse_sse_chunk))
+        Ok(crate::chat::create_sse_stream(response, |chunk| {
+            crate::sse::parse_sse_chunk_json::<CohereChatStreamResponse>(chunk)
+        }))
     }
 }
 
-// Convert a ChatMessage into a CohereChatMessage with 'static lifetime.
-fn chat_message_to_api_message(chat_msg: ChatMessage) -> CohereChatMessage<'static> {
+// Convert a ChatMessage into a CohereChatMessage.
+fn chat_message_to_api_message(chat_msg: ChatMessage) -> CohereChatMessage {
     CohereChatMessage {
         role: match chat_msg.role {
-            ChatRole::User => "user",
-            ChatRole::Assistant => "assistant",
+            ChatRole::User => ROLE_USER.to_string(),
+            ChatRole::Assistant => ROLE_ASSISTANT.to_string(),
         },
         tool_call_id: None,
         content: match &chat_msg.message_type {
             MessageType::Text => Some(Right(chat_msg.content.clone())),
-            MessageType::Image(_) => unreachable!(),
-            MessageType::Pdf(_) => unimplemented!(),
+            MessageType::Image(_) => unimplemented!("{}", ERR_IMAGE_NOT_IMPLEMENTED),
+            MessageType::Pdf(_) => unimplemented!("{}", ERR_PDF_NOT_IMPLEMENTED),
             MessageType::ImageURL(url) => {
-                let owned_url = url.clone();
-                let url_str = Box::leak(owned_url.into_boxed_str());
                 Some(Left(vec![CohereMessageContent {
-                    message_type: Some("image_url"),
+                    message_type: Some(MESSAGE_TYPE_IMAGE_URL.to_string()),
                     text: None,
-                    image_url: Some(ImageUrlContent { url: url_str }),
+                    image_url: Some(ImageUrlContent { url: url.clone() }),
                     tool_output: None,
                     tool_call_id: None,
                 }]))
@@ -543,22 +554,15 @@ fn chat_message_to_api_message(chat_msg: ChatMessage) -> CohereChatMessage<'stat
         },
         tool_calls: match &chat_msg.message_type {
             MessageType::ToolUse(calls) => {
-                let owned_calls: Vec<CohereFunctionCall<'static>> = calls
+                let owned_calls: Vec<CohereFunctionCall> = calls
                     .iter()
                     .map(|c| {
-                        let owned_id = c.id.clone();
-                        let owned_name = c.function.name.clone();
-                        let owned_args = c.function.arguments.clone();
-                        // Leak strings to static lifetime
-                        let id_str = Box::leak(owned_id.into_boxed_str());
-                        let name_str = Box::leak(owned_name.into_boxed_str());
-                        let args_str = Box::leak(owned_args.into_boxed_str());
                         CohereFunctionCall {
-                            id: id_str,
-                            content_type: "function",
+                            id: c.id.clone(),
+                            content_type: MESSAGE_TYPE_FUNCTION.to_string(),
                             function: CohereFunctionPayload {
-                                name: name_str,
-                                arguments: args_str,
+                                name: c.function.name.clone(),
+                                arguments: c.function.arguments.clone(),
                             },
                         }
                     })
@@ -570,39 +574,6 @@ fn chat_message_to_api_message(chat_msg: ChatMessage) -> CohereChatMessage<'stat
     }
 }
 
-/// SSE (Server-Sent Events) chunk parser for Cohere's streaming responses.
-///
-/// Parses an SSE data chunk and extracts any generated content.
-fn parse_sse_chunk(chunk: &str) -> Result<Option<String>, LLMError> {
-    let mut collected_content = String::new();
-    for line in chunk.lines() {
-        let line = line.trim();
-        if let Some(data) = line.strip_prefix("data: ") {
-            if data == "[DONE]" {
-                return if collected_content.is_empty() {
-                    Ok(None)
-                } else {
-                    Ok(Some(collected_content))
-                };
-            }
-            match serde_json::from_str::<CohereChatStreamResponse>(data) {
-                Ok(response) => {
-                    if let Some(choice) = response.choices.first() {
-                        if let Some(content) = &choice.delta.content {
-                            collected_content.push_str(content);
-                        }
-                    }
-                }
-                Err(_) => continue,
-            }
-        }
-    }
-    if collected_content.is_empty() {
-        Ok(None)
-    } else {
-        Ok(Some(collected_content))
-    }
-}
 
 #[derive(Deserialize, Debug)]
 struct CohereChatStreamResponse {
@@ -615,6 +586,14 @@ struct CohereChatStreamChoice {
 #[derive(Deserialize, Debug)]
 struct CohereChatStreamDelta {
     content: Option<String>,
+}
+
+impl crate::sse::SSEContentExtractor for CohereChatStreamResponse {
+    fn extract_content(&self) -> Option<&str> {
+        self.choices
+            .first()
+            .and_then(|c| c.delta.content.as_deref())
+    }
 }
 
 #[async_trait]

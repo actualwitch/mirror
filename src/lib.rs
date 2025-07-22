@@ -34,6 +34,9 @@ pub mod chat;
 /// Text completion capabilities (e.g. GPT-3 style completion)
 pub mod completion;
 
+/// Common constants used across different backends
+pub mod constants;
+
 /// Vector embeddings generation for text
 pub mod embedding;
 
@@ -51,6 +54,9 @@ pub mod stt;
 
 /// Text-to-speech support
 pub mod tts;
+
+/// Server-Sent Events (SSE) parsing utilities
+pub mod sse;
 
 /// Secret store for storing API keys and other sensitive information
 pub mod secret_store;

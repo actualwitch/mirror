@@ -309,7 +309,7 @@ impl Ollama {
         temperature: Option<f32>,
         timeout_seconds: Option<u64>,
         system: Option<String>,
-        stream: Option<bool>,
+        _stream: Option<bool>,
         top_p: Option<f32>,
         top_k: Option<u32>,
         json_schema: Option<StructuredOutputFormat>,

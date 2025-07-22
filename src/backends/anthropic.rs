@@ -373,7 +373,7 @@ impl ChatProvider for Anthropic {
                             tool_output: None,
                         }]
                     }
-                    MessageType::ImageURL(ref url) => vec![MessageContent {
+                    MessageType::ImageURL(url) => vec![MessageContent {
                         message_type: Some("image_url"),
                         text: None,
                         image_url: Some(ImageUrlContent { url }),

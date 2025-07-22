@@ -2,6 +2,8 @@
 //!
 //! This module provides integration with Azure OpenAI's GPT models through their API.
 
+use crate::constants::*;
+
 #[cfg(feature = "azure_openai")]
 use crate::{
     chat::Tool,
@@ -307,9 +309,14 @@ impl ChatResponse for AzureOpenAIChatResponse {
 
 impl std::fmt::Display for AzureOpenAIChatResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let first_choice = match self.choices.first() {
+            Some(choice) => choice,
+            None => return write!(f, "{}", ERR_NO_RESPONSE_CHOICES),
+        };
+        
         match (
-            &self.choices.first().unwrap().message.content,
-            &self.choices.first().unwrap().message.tool_calls,
+            &first_choice.message.content,
+            &first_choice.message.tool_calls,
         ) {
             (Some(content), Some(tool_calls)) => {
                 for tool_call in tool_calls {
@@ -427,7 +434,7 @@ impl ChatProvider for AzureOpenAI {
         let mut openai_msgs: Vec<AzureOpenAIChatMessage> = vec![];
 
         for msg in messages {
-            if let MessageType::ToolResult(ref results) = msg.message_type {
+            if let MessageType::ToolResult(results) = &msg.message_type {
                 for result in results {
                     openai_msgs.push(
                         // Clone strings to own them

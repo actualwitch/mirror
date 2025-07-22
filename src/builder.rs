@@ -109,6 +109,8 @@ pub struct LLMBuilder {
     model: Option<String>,
     /// Maximum tokens to generate in responses
     max_tokens: Option<u32>,
+    /// Maximum completion tokens (for newer OpenAI models)
+    max_completion_tokens: Option<u32>,
     /// Temperature parameter for controlling response randomness (0.0-1.0)
     temperature: Option<f32>,
     /// System prompt/context to guide model behavior
@@ -200,6 +202,12 @@ impl LLMBuilder {
     /// Sets the maximum number of tokens to generate.
     pub fn max_tokens(mut self, max_tokens: u32) -> Self {
         self.max_tokens = Some(max_tokens);
+        self
+    }
+
+    /// Sets the maximum completion tokens (for newer OpenAI models).
+    pub fn max_completion_tokens(mut self, max_completion_tokens: u32) -> Self {
+        self.max_completion_tokens = Some(max_completion_tokens);
         self
     }
 
@@ -539,6 +547,7 @@ impl LLMBuilder {
                         self.base_url,
                         self.model,
                         self.max_tokens,
+                        self.max_completion_tokens,
                         self.temperature,
                         self.timeout_seconds,
                         self.system,
@@ -558,7 +567,7 @@ impl LLMBuilder {
                         self.openai_web_search_user_location_approximate_country,
                         self.openai_web_search_user_location_approximate_city,
                         self.openai_web_search_user_location_approximate_region,
-                    ))
+                    )?)
                 }
             }
             LLMBackend::ElevenLabs => {
@@ -771,7 +780,7 @@ impl LLMBuilder {
                         self.tool_choice,
                         self.reasoning_effort,
                         self.json_schema,
-                    );
+                    )?;
                     Box::new(cohere)
                 }
             }
@@ -856,8 +865,8 @@ impl LLMBuilder {
 
     // Validate that tool configuration is consistent and valid
     fn validate_tool_config(&self) -> Result<(Option<Vec<Tool>>, Option<ToolChoice>), LLMError> {
-        match self.tool_choice {
-            Some(ToolChoice::Tool(ref name)) => {
+        match &self.tool_choice {
+            Some(ToolChoice::Tool(name)) => {
                 match self.tools.clone().map(|tools| tools.iter().any(|tool| tool.function.name == *name)) {
                     Some(true) => Ok((self.tools.clone(), self.tool_choice.clone())),
                     _ => Err(LLMError::ToolConfigError(format!("Tool({name}) cannot be tool choice: no tool with name {name} found.  Did you forget to add it with .function?"))),
