@@ -368,6 +368,18 @@ impl OpenAI {
     fn should_use_max_completion_tokens(model: &str) -> bool {
         REASONING_MODEL_PREFIXES.iter().any(|&prefix| model.starts_with(prefix))
     }
+    
+    /// Determines whether a model supports temperature parameter
+    fn supports_temperature(model: &str) -> bool {
+        // Reasoning models don't support temperature
+        !Self::should_use_max_completion_tokens(model)
+    }
+    
+    /// Determines whether a model supports top_p parameter
+    fn supports_top_p(model: &str) -> bool {
+        // Reasoning models don't support top_p
+        !Self::should_use_max_completion_tokens(model)
+    }
 
     /// Creates a new OpenAI client with the specified configuration.
     ///
@@ -377,11 +389,11 @@ impl OpenAI {
     /// * `model` - Model to use (defaults to "gpt-4")
     /// * `max_tokens` - Maximum tokens to generate (deprecated for newer models)
     /// * `max_completion_tokens` - Maximum completion tokens (for newer models)
-    /// * `temperature` - Sampling temperature
+    /// * `temperature` - Sampling temperature (ignored for reasoning models like o1, o3)
     /// * `timeout_seconds` - Request timeout in seconds
     /// * `system` - System prompt
     /// * `stream` - Whether to stream responses
-    /// * `top_p` - Top-p sampling parameter
+    /// * `top_p` - Top-p sampling parameter (ignored for reasoning models like o1, o3)
     /// * `top_k` - Top-k sampling parameter
     /// * `embedding_encoding_format` - Format for embedding outputs
     /// * `embedding_dimensions` - Dimensions for embedding vectors
@@ -568,15 +580,28 @@ impl ChatProvider for OpenAI {
         } else {
             (self.max_tokens, None)
         };
+        
+        // Only include temperature and top_p for models that support them
+        let temperature = if Self::supports_temperature(&self.model) {
+            self.temperature
+        } else {
+            None
+        };
+        
+        let top_p = if Self::supports_top_p(&self.model) {
+            self.top_p
+        } else {
+            None
+        };
 
         let body = OpenAIChatRequest {
             model: self.model.clone(),
             messages: openai_msgs,
             max_tokens,
             max_completion_tokens,
-            temperature: self.temperature,
+            temperature,
             stream: self.stream.unwrap_or(false),
-            top_p: self.top_p,
+            top_p,
             top_k: self.top_k,
             tools: request_tools,
             tool_choice: request_tool_choice,
@@ -693,13 +718,20 @@ impl ChatProvider for OpenAI {
         } else {
             (self.max_tokens, None)
         };
+        
+        // Only include temperature for models that support it
+        let temperature = if Self::supports_temperature(&self.model) {
+            self.temperature
+        } else {
+            None
+        };
 
         let body = OpenAIChatRequest {
             model: self.model.clone(),
             messages: openai_msgs,
             max_tokens,
             max_completion_tokens,
-            temperature: self.temperature,
+            temperature,
             stream: true,
             top_p: self.top_p,
             top_k: self.top_k,

@@ -542,6 +542,28 @@ impl LLMBuilder {
                     let key = self.api_key.ok_or_else(|| {
                         LLMError::InvalidRequest("No API key provided for OpenAI".to_string())
                     })?;
+                    
+                    // Validate parameters for reasoning models
+                    if let Some(model) = &self.model {
+                        let is_reasoning_model = crate::constants::REASONING_MODEL_PREFIXES.iter()
+                            .any(|&prefix| model.starts_with(prefix));
+                        
+                        if is_reasoning_model {
+                            if self.temperature.is_some() {
+                                log::warn!(
+                                    "Temperature parameter is not supported for reasoning model '{}'. It will be ignored.",
+                                    model
+                                );
+                            }
+                            if self.top_p.is_some() {
+                                log::warn!(
+                                    "Top-p parameter is not supported for reasoning model '{}'. It will be ignored.",
+                                    model
+                                );
+                            }
+                        }
+                    }
+                    
                     Box::new(crate::backends::openai::OpenAI::new(
                         key,
                         self.base_url,
