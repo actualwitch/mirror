@@ -5,7 +5,7 @@
 //! 2. Generate speech from text
 //! 3. Save the audio output to a file
 
-use llm::builder::{LLMBackend, LLMBuilder};
+use mirror::builder::{LLMBackend, LLMBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

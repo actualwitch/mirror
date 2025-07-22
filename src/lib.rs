@@ -68,7 +68,6 @@ pub mod agent;
 #[cfg(feature = "api")]
 pub mod api;
 
-
 #[inline]
 /// Initialize logging using env_logger if the "logging" feature is enabled.
 /// This is a no-op if the feature is not enabled.

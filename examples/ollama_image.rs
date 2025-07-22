@@ -5,7 +5,7 @@ use std::{
 
 use futures::StreamExt;
 // Import required modules from the LLM library for Google Gemini integration
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder}, // Builder pattern components
     chat::{ChatMessage, ImageMime},    // Chat-related structures
 };

@@ -1,4 +1,4 @@
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chat::{ChatMessage, ChatRole},
     evaluator::ParallelEvaluator,

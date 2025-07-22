@@ -161,7 +161,7 @@ impl ChatProvider for Groq {
 
         if log::log_enabled!(log::Level::Trace) {
             if let Ok(json) = serde_json::to_string(&body) {
-                log::trace!("Groq request payload: {}", json);
+                log::trace!("Groq request payload: {json}");
             }
         }
 

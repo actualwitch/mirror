@@ -1,5 +1,5 @@
 // Import required modules from the LLM library for OpenAI integration
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder}, // Builder pattern components
 };
 

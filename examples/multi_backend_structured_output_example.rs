@@ -1,6 +1,6 @@
 //! Send the same JSON schema to multiple backends for structured output.
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chat::{ChatMessage, StructuredOutputFormat},
 };

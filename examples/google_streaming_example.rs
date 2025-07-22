@@ -1,6 +1,6 @@
 // Google streaming chat example demonstrating real-time token generation
 use futures::StreamExt;
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chat::ChatMessage,
 };
@@ -23,11 +23,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .expect("Failed to build LLM (Google)");
 
     // Prepare conversation with a prompt that will generate a longer response
-    let messages = vec![
-        ChatMessage::user()
-            .content("Write a long story about a robot learning to paint. Make it creative and engaging.")
-            .build(),
-    ];
+    let messages = vec![ChatMessage::user()
+        .content(
+            "Write a long story about a robot learning to paint. Make it creative and engaging.",
+        )
+        .build()];
 
     println!("Starting streaming chat with Google...\n");
 
@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(mut stream) => {
             let stdout = io::stdout();
             let mut handle = stdout.lock();
-            
+
             while let Some(Ok(token)) = stream.next().await {
                 handle.write_all(token.as_bytes()).unwrap();
                 handle.flush().unwrap();

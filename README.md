@@ -2,12 +2,12 @@
 
 > **Note**: This crate name previously belonged to another project. The current implementation represents a new and different library. The previous crate is now archived and will not receive any updates. **ref: https://github.com/rustformers/llm**
 
-**LLM** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [xAI](https://x.ai), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), and [ElevenLabs](https://elevenlabs.io).
+**LLM** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), and [ElevenLabs](https://elevenlabs.io).
 With a **unified API** and **builder style** - similar to the Stripe experience - you can easily create **chat**, text **completion**, speak-to-text requests without multiplying structures and crates.
 
 ## Key Features
 
-- **Multi-backend**: Manage OpenAI, Anthropic, Ollama, DeepSeek, xAI, Phind, Groq, Cohere, Elevenlabs and Google through a single entry point.
+- **Multi-backend**: Manage OpenAI, Anthropic, Ollama, DeepSeek, Phind, Groq, Cohere, Elevenlabs and Google through a single entry point.
 - **Multi-step chains**: Create multi-step chains with different backends at each step.
 - **Templates**: Use templates to create complex prompts with variables.
 - **Builder pattern**: Configure your LLM (model, temperature, max_tokens, timeouts...) with a few simple calls.
@@ -33,12 +33,12 @@ Simply add **LLM** to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-llm = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "xai", "phind", "google", "groq", "Elevenlabs"] }
+llm = { version = "0.1.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "Elevenlabs"] }
 ```
 
 ## Use any LLM on cli
 
-LLM includes a command-line tool for easily interacting with different LLM models. You can install it with: ```cargo install llm```
+LLM includes a command-line tool for easily interacting with different LLM models. You can install it with: ```cargo install mirror```
 
 - Use `llm` to start an interactive chat session
 - Use `llm openai:gpt-4o` to start an interactive chat session with provider:model
@@ -54,7 +54,7 @@ LLM includes a command-line tool for easily interacting with different LLM model
 
 ```shell
 [dependencies]
-llm = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "xai", "phind", "google", "groq", "api", "elevenlabs"] }
+llm = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "api", "elevenlabs"] }
 ```
 
 More details in the [`api_example`](examples/api_example.rs)
@@ -74,8 +74,6 @@ More details in the [`api_example`](examples/api_example.rs)
 | [`openai_streaming_example`](examples/openai_streaming_example.rs) | OpenAI streaming chat example demonstrating real-time token generation |
 | [`phind_example`](examples/phind_example.rs) | Basic Phind chat completion example with Phind-70B model |
 | [`validator_example`](examples/validator_example.rs) | Basic validator example with Anthropic's Claude model |
-| [`xai_example`](examples/xai_example.rs) | Basic xAI chat completion example with Grok models |
-| [`xai_streaming_example`](examples/xai_streaming_example.rs) | X.AI streaming chat example demonstrating real-time token generation |
 | [`evaluation_example`](examples/evaluation_example.rs) | Basic evaluation example with Anthropic, Phind and DeepSeek |
 | [`evaluator_parallel_example`](examples/evaluator_parallel_example.rs) | Evaluate multiple LLM providers in parallel |
 | [`google_example`](examples/google_example.rs) | Basic Google Gemini chat completion example with Gemini models |
@@ -101,8 +99,6 @@ More details in the [`api_example`](examples/api_example.rs)
 | [`openai_tts_example`](examples/openai_tts_example.rs) | Text-to-speech example using OpenAI |
 | [`tts_rodio_example`](examples/tts_rodio_example.rs) | Text-to-speech with rodio example using OpenAI |
 | [`chain_audio_text_example`](examples/chain_audio_text_example.rs) | Example demonstrating a multi-step chain combining speech-to-text and text processing |
-| [`xai_search_chain_tts_example`](examples/xai_search_chain_tts_example.rs) | Example demonstrating a multi-step chain combining XAI search, OpenAI summarization, and ElevenLabs text-to-speech with Rodio playback |
-| [`xai_search_example`](examples/xai_search_example.rs) | Example demonstrating X.AI search functionality with search modes, date ranges, and source filtering |
 | [`memory_example`](examples/memory_example.rs) | Automatic memory integration - LLM remembers conversation context across calls |
 | [`memory_share_example`](examples/memory_share_example.rs) | Example demonstrating shared memory between multiple LLM providers |
 | [`trim_strategy_example`](examples/trim_strategy_example.rs) | Example demonstrating memory trimming strategies with automatic summarization |
@@ -119,4 +115,4 @@ More details in the [`api_example`](examples/api_example.rs)
 
 
 ## Usage
-Here's a basic example using OpenAI for chat completion. See the examples directory for other backends (Anthropic, Ollama, DeepSeek, xAI, Google, Phind, Elevenlabs), embedding capabilities, and more advanced use cases.
+Here's a basic example using OpenAI for chat completion. See the examples directory for other backends (Anthropic, Ollama, DeepSeek, Google, Phind, Elevenlabs), embedding capabilities, and more advanced use cases.

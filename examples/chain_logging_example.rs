@@ -14,7 +14,7 @@
 //! ```
 //! The `cli` feature transitively enables all back-ends (`full` feature).
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::{LLMRegistryBuilder, MultiChainStepBuilder, MultiChainStepMode, MultiPromptChain},
 };

@@ -1,7 +1,7 @@
 use std::fs;
 
 // Import required modules from the LLM library for Anthropic integration
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder}, // Builder pattern components
     chat::{ChatMessage, ImageMime},    // Chat-related structures
 };

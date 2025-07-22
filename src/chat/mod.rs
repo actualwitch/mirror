@@ -136,7 +136,7 @@ pub struct FunctionTool {
 /// ## Example
 ///
 /// ```
-/// use llm::chat::StructuredOutputFormat;
+/// use mirror::chat::StructuredOutputFormat;
 /// use serde_json::json;
 ///
 /// let response_format = r#"
@@ -289,7 +289,8 @@ pub trait ChatProvider: Sync + Send {
     async fn chat_stream(
         &self,
         _messages: &[ChatMessage],
-    ) -> Result<std::pin::Pin<Box<dyn Stream<Item = Result<String, LLMError>> + Send>>, LLMError> {
+    ) -> Result<std::pin::Pin<Box<dyn Stream<Item = Result<String, LLMError>> + Send>>, LLMError>
+    {
         Err(LLMError::Generic(
             "Streaming not supported for this provider".to_string(),
         ))

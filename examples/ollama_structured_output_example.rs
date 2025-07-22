@@ -1,5 +1,5 @@
 // Import required modules from the LLM library
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chat::{ChatMessage, StructuredOutputFormat},
 };

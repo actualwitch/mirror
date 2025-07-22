@@ -1,17 +1,16 @@
 [package]
-name = "llm"
-version = "1.3.1"
+name = "mirror"
+version = "0.1.0"
 edition = "2021"
 description = "A Rust library unifying multiple LLM backends."
 license = "MIT"
 authors = [
-    "Tristan Granier <graniet75@gmail.com>",
-    "Jared Kofron <jared.kofron@gmail.com>",
+    "Adelaide あで Fisher <noreply@actualwitch.me>",
 ]
-repository = "https://github.com/graniet/llm"
-documentation = "https://docs.rs/llm"
-homepage = "https://github.com/graniet/llm"
-default-run = "llm"
+repository = "https://github.com/actualwitch/mirror"
+documentation = "https://docs.rs/mirror"
+homepage = "https://github.com/actualwitch/mirror"
+default-run = "mirror"
 
 [features]
 default = ["cli", "default-tls"]
@@ -22,7 +21,6 @@ full = [
     "anthropic",
     "ollama",
     "deepseek",
-    "xai",
     "phind",
     "google",
     "groq",
@@ -36,7 +34,6 @@ openai = []
 anthropic = []
 ollama = []
 deepseek = []
-xai = []
 phind = []
 google = []
 groq = []
@@ -74,8 +71,8 @@ env_logger = { version = "0.11", optional = true }
 chrono = {version = "0.4", default-features = false, features = ["serde"]}
 
 [[bin]]
-name = "llm"
-path = "src/bin/llm-cli.rs"
+name = "mirror"
+path = "src/bin/mirror-cli.rs"
 required-features = ["cli"]
 
 [dev-dependencies]

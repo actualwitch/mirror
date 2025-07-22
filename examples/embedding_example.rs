@@ -1,5 +1,5 @@
 // Import required builder types from llm
-use llm::builder::{LLMBackend, LLMBuilder};
+use mirror::builder::{LLMBackend, LLMBuilder};
 
 /// Example demonstrating how to generate embeddings using OpenAI's API
 ///
@@ -11,7 +11,7 @@ use llm::builder::{LLMBackend, LLMBuilder};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize the LLM builder with OpenAI configuration
     let llm = LLMBuilder::new()
-        .backend(LLMBackend::OpenAI) // .backend(LLMBackend::Ollama) or .backend(LLMBackend::XAI)
+        .backend(LLMBackend::OpenAI) // .backend(LLMBackend::Ollama)
         // Get API key from environment variable or use test key
         .api_key(std::env::var("OPENAI_API_KEY").unwrap_or("sk-TESTKEY".to_string()))
         // Use OpenAI's text embedding model

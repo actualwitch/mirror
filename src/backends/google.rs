@@ -13,8 +13,8 @@
 //!
 //! # Example
 //! ```no_run
-//! use llm::backends::google::Google;
-//! use llm::chat::{ChatMessage, ChatRole, ChatProvider};
+//! use mirror::backends::google::Google;
+//! use mirror::chat::{ChatMessage, ChatRole, ChatProvider};
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -175,14 +175,14 @@ impl std::fmt::Display for GoogleChatResponse {
         match (self.text(), self.tool_calls()) {
             (Some(text), Some(tool_calls)) => {
                 for call in tool_calls {
-                    write!(f, "{}", call)?;
+                    write!(f, "{call}")?;
                 }
-                write!(f, "{}", text)
+                write!(f, "{text}")
             }
-            (Some(text), None) => write!(f, "{}", text),
+            (Some(text), None) => write!(f, "{text}"),
             (None, Some(tool_calls)) => {
                 for call in tool_calls {
-                    write!(f, "{}", call)?;
+                    write!(f, "{call}")?;
                 }
                 Ok(())
             }
@@ -613,7 +613,7 @@ impl ChatProvider for Google {
 
         if log::log_enabled!(log::Level::Trace) {
             if let Ok(json) = serde_json::to_string(&req_body) {
-                log::trace!("Google Gemini request payload: {}", json);
+                log::trace!("Google Gemini request payload: {json}");
             }
         }
 
@@ -647,7 +647,7 @@ impl ChatProvider for Google {
             Err(e) => {
                 // Return a more descriptive error with the raw response
                 Err(LLMError::ResponseFormatError {
-                    message: format!("Failed to decode Google API response: {}", e),
+                    message: format!("Failed to decode Google API response: {e}"),
                     raw_response: resp_text,
                 })
             }
@@ -788,7 +788,7 @@ impl ChatProvider for Google {
 
         if log::log_enabled!(log::Level::Trace) {
             if let Ok(json) = serde_json::to_string(&req_body) {
-                log::trace!("Google Gemini request payload (tool): {}", json);
+                log::trace!("Google Gemini request payload (tool): {json}");
             }
         }
 
@@ -823,7 +823,7 @@ impl ChatProvider for Google {
             Err(e) => {
                 // Return a more descriptive error with the raw response
                 Err(LLMError::ResponseFormatError {
-                    message: format!("Failed to decode Google API response: {}", e),
+                    message: format!("Failed to decode Google API response: {e}"),
                     raw_response: resp_text,
                 })
             }
@@ -842,7 +842,8 @@ impl ChatProvider for Google {
     async fn chat_stream(
         &self,
         messages: &[ChatMessage],
-    ) -> Result<std::pin::Pin<Box<dyn Stream<Item = Result<String, LLMError>> + Send>>, LLMError> {
+    ) -> Result<std::pin::Pin<Box<dyn Stream<Item = Result<String, LLMError>> + Send>>, LLMError>
+    {
         if self.api_key.is_empty() {
             return Err(LLMError::AuthError("Missing Google API key".to_string()));
         }
@@ -924,12 +925,15 @@ impl ChatProvider for Google {
             let status = response.status();
             let error_text = response.text().await?;
             return Err(LLMError::ResponseFormatError {
-                message: format!("Google API returned error status: {}", status),
+                message: format!("Google API returned error status: {status}"),
                 raw_response: error_text,
             });
         }
 
-        Ok(crate::chat::create_sse_stream(response, parse_google_sse_chunk))
+        Ok(crate::chat::create_sse_stream(
+            response,
+            parse_google_sse_chunk,
+        ))
     }
 }
 
@@ -1024,10 +1028,8 @@ impl LLMProvider for Google {
 fn parse_google_sse_chunk(chunk: &str) -> Result<Option<String>, LLMError> {
     for line in chunk.lines() {
         let line = line.trim();
-        
-        if line.starts_with("data: ") {
-            let data = &line[6..];
-            
+
+        if let Some(data) = line.strip_prefix("data: ") {
             match serde_json::from_str::<GoogleStreamResponse>(data) {
                 Ok(response) => {
                     if let Some(candidates) = response.candidates {
@@ -1045,7 +1047,7 @@ fn parse_google_sse_chunk(chunk: &str) -> Result<Option<String>, LLMError> {
             }
         }
     }
-    
+
     Ok(None)
 }
 

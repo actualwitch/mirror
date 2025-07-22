@@ -31,8 +31,8 @@ pub enum TrimStrategy {
 /// # Examples
 ///
 /// ```rust
-/// use llm::memory::SlidingWindowMemory;
-/// use llm::chat::ChatMessage;
+/// use mirror::memory::SlidingWindowMemory;
+/// use mirror::chat::ChatMessage;
 ///
 /// let mut memory = SlidingWindowMemory::new(3);
 ///
@@ -67,7 +67,7 @@ impl SlidingWindowMemory {
     /// # Examples
     ///
     /// ```rust
-    /// use llm::memory::SlidingWindowMemory;
+    /// use mirror::memory::SlidingWindowMemory;
     ///
     /// let memory = SlidingWindowMemory::new(10);
     /// assert_eq!(memory.window_size(), 10);

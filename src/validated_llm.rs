@@ -7,7 +7,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use llm::builder::{LLMBuilder, LLMBackend};
+//! use mirror::builder::{LLMBuilder, LLMBackend};
 //!
 //! let llm = LLMBuilder::new()
 //!     .backend(LLMBackend::OpenAI)
@@ -113,30 +113,24 @@ impl ChatProvider for ValidatedLLM {
                     remaining_attempts -= 1;
                     if remaining_attempts == 0 {
                         return Err(LLMError::InvalidRequest(format!(
-                            "Validation error after max attempts: {}",
-                            err
+                            "Validation error after max attempts: {err}"
                         )));
                     }
 
                     log::debug!(
-                        "Completion validation failed (attempts remaining: {}). Reason: {}",
-                        remaining_attempts,
-                        err
+                        "Completion validation failed (attempts remaining: {remaining_attempts}). Reason: {err}"
                     );
 
                     log::debug!(
-                        "Validation failed (attempt remaining: {}). Reason: {}",
-                        remaining_attempts,
-                        err
+                        "Validation failed (attempt remaining: {remaining_attempts}). Reason: {err}"
                     );
 
                     local_messages.push(ChatMessage {
                         role: ChatRole::User,
                         message_type: MessageType::Text,
                         content: format!(
-                            "Your previous output was invalid because: {}\n\
-                             Please try again and produce a valid response.",
-                            err
+                            "Your previous output was invalid because: {err}\n\
+                             Please try again and produce a valid response."
                         ),
                     });
                 }
@@ -177,8 +171,7 @@ impl CompletionProvider for ValidatedLLM {
                     remaining_attempts -= 1;
                     if remaining_attempts == 0 {
                         return Err(LLMError::InvalidRequest(format!(
-                            "Validation error after max attempts: {}",
-                            err
+                            "Validation error after max attempts: {err}"
                         )));
                     }
                 }

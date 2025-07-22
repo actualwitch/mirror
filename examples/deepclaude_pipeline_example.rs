@@ -7,7 +7,7 @@
 //! 4. Transform and filter responses between steps
 //! 5. Handle results in a type-safe way with error handling
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::{LLMRegistryBuilder, MultiChainStepBuilder, MultiChainStepMode, MultiPromptChain},
 };

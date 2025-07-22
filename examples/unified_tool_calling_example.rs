@@ -10,7 +10,7 @@
 // Providers: openai, anthropic, google
 // Scenarios: simple, multi, choice
 
-use llm::{
+use mirror::{
     builder::{FunctionBuilder, LLMBackend, LLMBuilder, ParamBuilder},
     chat::{ChatMessage, ToolChoice},
     FunctionCall, LLMProvider, ToolCall,

@@ -1,5 +1,5 @@
 // Import necessary modules for Cohere backend
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder}, // Builder components
     chat::ChatMessage,                 // Chat message structures
 };
@@ -11,22 +11,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Initialize and configure the LLM client with Cohere
     let llm = LLMBuilder::new()
-        .backend(LLMBackend::Cohere)        // Use Cohere as LLM provider
-        .api_key(api_key)                   // Set API key
-        .model("command-light")             // Choose a Cohere model (free-tier)
+        .backend(LLMBackend::Cohere) // Use Cohere as LLM provider
+        .api_key(api_key) // Set API key
+        .model("command-light") // Choose a Cohere model (free-tier)
         .system("Answer like a pirate.") // System instruction (sent with 'developer' role)
-        .max_tokens(200)                    // Limit response length
-        .temperature(0.7)                   // Set response creativity
-        .stream(false)                      // Disable streaming for this example
+        .max_tokens(200) // Limit response length
+        .temperature(0.7) // Set response creativity
+        .stream(false) // Disable streaming for this example
         .build()
         .expect("Failed to build LLM (Cohere)");
 
     // Prepare conversation history with a user message
-    let messages = vec![
-        ChatMessage::user()
-            .content("What is 2 + 2?")
-            .build(),
-    ];
+    let messages = vec![ChatMessage::user().content("What is 2 + 2?").build()];
 
     // Send chat request and display response or error
     match llm.chat(&messages).await {

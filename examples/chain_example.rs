@@ -6,7 +6,7 @@
 //! 3. Generate a code example for one feature
 //! 4. Get a detailed explanation of the example
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::{ChainStepBuilder, ChainStepMode, PromptChain},
 };

@@ -1,5 +1,5 @@
 // Import required modules from the LLM library for Anthropic integration
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder}, // Builder pattern components
     chat::ChatMessage,                 // Chat-related structures
 };
@@ -28,8 +28,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Send chat request and handle the response
     match llm.chat(&messages).await {
-        Ok(text) => println!("Anthropic chat response:\n{}", text),
-        Err(e) => eprintln!("Chat error: {}", e),
+        Ok(text) => println!("Anthropic chat response:\n{text}"),
+        Err(e) => eprintln!("Chat error: {e}"),
     }
 
     Ok(())

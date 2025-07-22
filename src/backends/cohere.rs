@@ -10,7 +10,7 @@ use crate::{
     completion::{CompletionProvider, CompletionRequest, CompletionResponse},
     embedding::EmbeddingProvider,
     error::LLMError,
-    models::{ModelsProvider},
+    models::ModelsProvider,
     stt::SpeechToTextProvider,
     tts::TextToSpeechProvider,
     LLMProvider,
@@ -218,7 +218,9 @@ impl ChatResponse for CohereChatResponse {
         self.choices.first().and_then(|c| c.message.content.clone())
     }
     fn tool_calls(&self) -> Option<Vec<ToolCall>> {
-        self.choices.first().and_then(|c| c.message.tool_calls.clone())
+        self.choices
+            .first()
+            .and_then(|c| c.message.tool_calls.clone())
     }
 }
 
@@ -230,14 +232,14 @@ impl std::fmt::Display for CohereChatResponse {
         ) {
             (Some(content), Some(tool_calls)) => {
                 for tool_call in tool_calls {
-                    write!(f, "{}", tool_call)?;
+                    write!(f, "{tool_call}")?;
                 }
-                write!(f, "{}", content)
+                write!(f, "{content}")
             }
-            (Some(content), None) => write!(f, "{}", content),
+            (Some(content), None) => write!(f, "{content}"),
             (None, Some(tool_calls)) => {
                 for tool_call in tool_calls {
-                    write!(f, "{}", tool_call)?;
+                    write!(f, "{tool_call}")?;
                 }
                 Ok(())
             }
@@ -397,7 +399,7 @@ impl ChatProvider for Cohere {
 
         if log::log_enabled!(log::Level::Trace) {
             if let Ok(json) = serde_json::to_string(&body) {
-                log::trace!("Cohere request payload: {}", json);
+                log::trace!("Cohere request payload: {json}");
             }
         }
         if let Some(timeout) = self.timeout_seconds {
@@ -410,7 +412,7 @@ impl ChatProvider for Cohere {
             let status = response.status();
             let error_text = response.text().await?;
             return Err(LLMError::ResponseFormatError {
-                message: format!("Cohere API returned error status: {}", status),
+                message: format!("Cohere API returned error status: {status}"),
                 raw_response: error_text,
             });
         }
@@ -421,7 +423,7 @@ impl ChatProvider for Cohere {
         match json_resp {
             Ok(res) => Ok(Box::new(res)),
             Err(e) => Err(LLMError::ResponseFormatError {
-                message: format!("Failed to decode Cohere API response: {}", e),
+                message: format!("Failed to decode Cohere API response: {e}"),
                 raw_response: resp_text,
             }),
         }
@@ -504,7 +506,7 @@ impl ChatProvider for Cohere {
             let status = response.status();
             let error_text = response.text().await?;
             return Err(LLMError::ResponseFormatError {
-                message: format!("Cohere API returned error status: {}", status),
+                message: format!("Cohere API returned error status: {status}"),
                 raw_response: error_text,
             });
         }
@@ -618,7 +620,7 @@ struct CohereChatStreamDelta {
 #[async_trait]
 impl CompletionProvider for Cohere {
     /// Sends a completion request to Cohere's API (not supported in compatibility mode).
-    async fn complete(&self, _req: & CompletionRequest) -> Result<CompletionResponse, LLMError> {
+    async fn complete(&self, _req: &CompletionRequest) -> Result<CompletionResponse, LLMError> {
         Ok(CompletionResponse {
             text: "Cohere completion not implemented.".into(),
         })

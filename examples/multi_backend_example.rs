@@ -6,7 +6,7 @@
 //! 3. Build a multi-step chain that uses different backends at each step
 //! 4. Pass results between steps using template variables
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::{LLMRegistryBuilder, MultiChainStepBuilder, MultiChainStepMode, MultiPromptChain},
 };

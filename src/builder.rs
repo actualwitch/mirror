@@ -31,8 +31,6 @@ pub enum LLMBackend {
     Ollama,
     /// DeepSeek API provider for their LLM models
     DeepSeek,
-    /// X.AI (formerly Twitter) API provider
-    XAI,
     /// Phind API provider for code-specialized models
     Phind,
     /// Google Gemini API provider
@@ -65,7 +63,7 @@ pub enum LLMBackend {
 ///
 /// ```
 /// use std::str::FromStr;
-/// use llm::builder::LLMBackend;
+/// use mirror::builder::LLMBackend;
 ///
 /// let backend = LLMBackend::from_str("openai").unwrap();
 /// assert!(matches!(backend, LLMBackend::OpenAI));
@@ -82,7 +80,6 @@ impl std::str::FromStr for LLMBackend {
             "anthropic" => Ok(LLMBackend::Anthropic),
             "ollama" => Ok(LLMBackend::Ollama),
             "deepseek" => Ok(LLMBackend::DeepSeek),
-            "xai" => Ok(LLMBackend::XAI),
             "phind" => Ok(LLMBackend::Phind),
             "google" => Ok(LLMBackend::Google),
             "groq" => Ok(LLMBackend::Groq),
@@ -152,18 +149,6 @@ pub struct LLMBuilder {
     deployment_id: Option<String>,
     /// Voice
     voice: Option<String>,
-    /// Search parameters for providers that support search functionality
-    xai_search_mode: Option<String>,
-    /// XAI search source type
-    xai_search_source_type: Option<String>,
-    /// XAI search excluded websites
-    xai_search_excluded_websites: Option<Vec<String>>,
-    /// XAI search max results
-    xai_search_max_results: Option<u32>,
-    /// XAI search from date
-    xai_search_from_date: Option<String>,
-    /// XAI search to date
-    xai_search_to_date: Option<String>,
     /// Memory provider for conversation history (optional)
     memory: Option<Box<dyn MemoryProvider>>,
     /// Use web search
@@ -377,74 +362,38 @@ impl LLMBuilder {
     }
 
     /// Set the web search user location type
-    pub fn openai_web_search_user_location_type(mut self, location_type: impl Into<String>) -> Self {
+    pub fn openai_web_search_user_location_type(
+        mut self,
+        location_type: impl Into<String>,
+    ) -> Self {
         self.openai_web_search_user_location_type = Some(location_type.into());
         self
     }
 
     /// Set the web search user location approximate country
-    pub fn openai_web_search_user_location_approximate_country(mut self, country: impl Into<String>) -> Self {
+    pub fn openai_web_search_user_location_approximate_country(
+        mut self,
+        country: impl Into<String>,
+    ) -> Self {
         self.openai_web_search_user_location_approximate_country = Some(country.into());
         self
     }
 
     /// Set the web search user location approximate city
-    pub fn openai_web_search_user_location_approximate_city(mut self, city: impl Into<String>) -> Self {
+    pub fn openai_web_search_user_location_approximate_city(
+        mut self,
+        city: impl Into<String>,
+    ) -> Self {
         self.openai_web_search_user_location_approximate_city = Some(city.into());
         self
     }
 
     /// Set the web search user location approximate region
-    pub fn openai_web_search_user_location_approximate_region(mut self, region: impl Into<String>) -> Self {
-        self.openai_web_search_user_location_approximate_region = Some(region.into());
-        self
-    }
-    
-
-    #[deprecated(note = "Renamed to `xai_search_mode`.")]
-    pub fn search_mode(self, mode: impl Into<String>) -> Self {
-        self.xai_search_mode(mode)
-    }
-
-    /// Sets the search mode for search-enabled providers.
-    pub fn xai_search_mode(mut self, mode: impl Into<String>) -> Self {
-        self.xai_search_mode = Some(mode.into());
-        self
-    }
-
-    /// Adds a search source with optional excluded websites.
-    pub fn xai_search_source(
+    pub fn openai_web_search_user_location_approximate_region(
         mut self,
-        source_type: impl Into<String>,
-        excluded_websites: Option<Vec<String>>,
+        region: impl Into<String>,
     ) -> Self {
-        self.xai_search_source_type = Some(source_type.into());
-        self.xai_search_excluded_websites = excluded_websites;
-        self
-    }
-
-    /// Sets the maximum number of search results.
-    pub fn xai_max_search_results(mut self, max: u32) -> Self {
-        self.xai_search_max_results = Some(max);
-        self
-    }
-
-    /// Sets the date range for search results.
-    pub fn xai_search_date_range(mut self, from: impl Into<String>, to: impl Into<String>) -> Self {
-        self.xai_search_from_date = Some(from.into());
-        self.xai_search_to_date = Some(to.into());
-        self
-    }
-
-    /// Sets the start date for search results (format: "YYYY-MM-DD").
-    pub fn xai_search_from_date(mut self, date: impl Into<String>) -> Self {
-        self.xai_search_from_date = Some(date.into());
-        self
-    }
-
-    /// Sets the end date for search results (format: "YYYY-MM-DD").
-    pub fn xai_search_to_date(mut self, date: impl Into<String>) -> Self {
-        self.xai_search_to_date = Some(date.into());
+        self.openai_web_search_user_location_approximate_region = Some(region.into());
         self
     }
 
@@ -457,8 +406,8 @@ impl LLMBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use llm::builder::{LLMBuilder, LLMBackend};
-    /// use llm::memory::SlidingWindowMemory;
+    /// use mirror::builder::{LLMBuilder, LLMBackend};
+    /// use mirror::memory::SlidingWindowMemory;
     ///
     /// let memory = Box::new(SlidingWindowMemory::new(10));
     /// let builder = LLMBuilder::new()
@@ -479,8 +428,8 @@ impl LLMBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use llm::builder::{LLMBuilder, LLMBackend};
-    /// use llm::memory::SlidingWindowMemory;
+    /// use mirror::builder::{LLMBuilder, LLMBackend};
+    /// use mirror::memory::SlidingWindowMemory;
     ///
     /// let memory = SlidingWindowMemory::new(10);
     /// let builder = LLMBuilder::new()
@@ -503,7 +452,7 @@ impl LLMBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use llm::builder::{LLMBuilder, LLMBackend};
+    /// use mirror::builder::{LLMBuilder, LLMBackend};
     ///
     /// let builder = LLMBuilder::new()
     ///     .backend(LLMBackend::OpenAI)
@@ -524,8 +473,8 @@ impl LLMBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use llm::builder::{LLMBuilder, LLMBackend};
-    /// use llm::memory::TrimStrategy;
+    /// use mirror::builder::{LLMBuilder, LLMBackend};
+    /// use mirror::memory::TrimStrategy;
     ///
     /// let builder = LLMBuilder::new()
     ///     .backend(LLMBackend::OpenAI)
@@ -542,7 +491,6 @@ impl LLMBuilder {
         )));
         self
     }
-
 
     /// Builds and returns a configured LLM provider instance.
     ///
@@ -717,41 +665,6 @@ impl LLMBuilder {
                     );
 
                     Box::new(deepseek)
-                }
-            }
-            LLMBackend::XAI => {
-                #[cfg(not(feature = "xai"))]
-                return Err(LLMError::InvalidRequest(
-                    "XAI feature not enabled".to_string(),
-                ));
-
-                #[cfg(feature = "xai")]
-                {
-                    let api_key = self.api_key.ok_or_else(|| {
-                        LLMError::InvalidRequest("No API key provided for XAI".to_string())
-                    })?;
-
-                    let xai = crate::backends::xai::XAI::new(
-                        api_key,
-                        self.model,
-                        self.max_tokens,
-                        self.temperature,
-                        self.timeout_seconds,
-                        self.system,
-                        self.stream,
-                        self.top_p,
-                        self.top_k,
-                        self.embedding_encoding_format,
-                        self.embedding_dimensions,
-                        self.json_schema,
-                        self.xai_search_mode,
-                        self.xai_search_source_type,
-                        self.xai_search_excluded_websites,
-                        self.xai_search_max_results,
-                        self.xai_search_from_date,
-                        self.xai_search_to_date,
-                    );
-                    Box::new(xai)
                 }
             }
             LLMBackend::Phind => {
@@ -947,7 +860,7 @@ impl LLMBuilder {
             Some(ToolChoice::Tool(ref name)) => {
                 match self.tools.clone().map(|tools| tools.iter().any(|tool| tool.function.name == *name)) {
                     Some(true) => Ok((self.tools.clone(), self.tool_choice.clone())),
-                    _ => Err(LLMError::ToolConfigError(format!("Tool({}) cannot be tool choice: no tool with name {} found.  Did you forget to add it with .function?", name, name))),
+                    _ => Err(LLMError::ToolConfigError(format!("Tool({name}) cannot be tool choice: no tool with name {name} found.  Did you forget to add it with .function?"))),
                 }
             }
             Some(_) if self.tools.is_none() => Err(LLMError::ToolConfigError(

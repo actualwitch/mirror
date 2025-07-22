@@ -5,7 +5,7 @@
 //! 2. Load an audio file
 //! 3. Transcribe the audio content
 
-use llm::builder::{LLMBackend, LLMBuilder};
+use mirror::builder::{LLMBackend, LLMBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,6 +25,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Transcribe audio content
     let resp = stt.transcribe(audio_bytes).await?;
 
-    println!("Transcription: {}", resp);
+    println!("Transcription: {resp}");
     Ok(())
 }

@@ -5,12 +5,12 @@
 //! 2. reviewer - judges the answer (ACCEPT / REJECT).
 //! 3. resumer - summarizes the discussion when the answer is accepted.
 
-use llm::{
+use mirror::{
     agent::AgentBuilder,
     builder::{LLMBackend, LLMBuilder},
     chat::ChatMessage,
-    memory::{SharedMemory, SlidingWindowMemory},
     cond,
+    memory::{SharedMemory, SlidingWindowMemory},
 };
 
 #[tokio::main]

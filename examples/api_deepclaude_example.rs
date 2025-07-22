@@ -27,7 +27,7 @@
 //! }
 //! ```
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::LLMRegistryBuilder,
 };

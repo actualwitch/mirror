@@ -6,7 +6,7 @@
 //! 3. Build a chain that transcribes audio and processes the text
 //! 4. Execute the chain and display results
 
-use llm::{
+use mirror::{
     builder::{LLMBackend, LLMBuilder},
     chain::{LLMRegistryBuilder, MultiChainStepBuilder, MultiChainStepMode, MultiPromptChain},
 };
@@ -54,6 +54,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .run().await?;
 
     // Display results from all steps
-    println!("Results: {:?}", chain_res);
+    println!("Results: {chain_res:?}");
     Ok(())
 }

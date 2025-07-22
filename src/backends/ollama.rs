@@ -121,7 +121,7 @@ impl std::fmt::Display for OllamaResponse {
             }
         }
 
-        write!(f, "{}", text)
+        write!(f, "{text}")
     }
 }
 
@@ -370,7 +370,7 @@ impl Ollama {
         OllamaChatRequest {
             model: self.model.clone(),
             messages: chat_messages,
-            stream: stream,
+            stream,
             options: Some(OllamaOptions {
                 top_p: self.top_p,
                 top_k: self.top_k,
@@ -396,7 +396,7 @@ impl ChatProvider for Ollama {
 
         if log::log_enabled!(log::Level::Trace) {
             if let Ok(json) = serde_json::to_string(&req_body) {
-                log::trace!("Ollama request payload (tools): {}", json);
+                log::trace!("Ollama request payload (tools): {json}");
             }
         }
 

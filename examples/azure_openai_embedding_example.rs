@@ -1,5 +1,5 @@
 // Import required builder types from llm
-use llm::builder::{LLMBackend, LLMBuilder};
+use mirror::builder::{LLMBackend, LLMBuilder};
 
 /// Example demonstrating how to generate embeddings using Google's API
 ///

@@ -161,8 +161,7 @@ impl Phind {
                     .to_string();
 
                 Err(LLMError::ProviderError(format!(
-                    "APIError {}: {}",
-                    status, error_message
+                    "APIError {status}: {error_message}"
                 )))
             }
         }
@@ -219,7 +218,7 @@ impl ChatProvider for Phind {
         });
 
         if log::log_enabled!(log::Level::Trace) {
-            log::trace!("Phind request payload: {}", payload);
+            log::trace!("Phind request payload: {payload}");
         }
 
         let headers = Self::create_headers()?;

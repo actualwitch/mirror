@@ -7,7 +7,7 @@
 
 use std::{fs::File, io::BufReader};
 
-use llm::builder::{LLMBackend, LLMBuilder};
+use mirror::builder::{LLMBackend, LLMBuilder};
 use rodio::{Decoder, OutputStream, Sink};
 
 #[tokio::main]
