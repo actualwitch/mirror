@@ -3,7 +3,7 @@
 //! This module provides integration with Groq's LLM models through their API.
 
 use crate::{
-    chat::{ChatMessage, ChatProvider, ChatResponse, ChatRole, Tool},
+    chat::{ChatMessage, ChatProvider, ChatResponse, ChatRole, Tool, Usage},
     completion::{CompletionProvider, CompletionRequest, CompletionResponse},
     embedding::EmbeddingProvider,
     error::LLMError,
@@ -54,6 +54,14 @@ struct GroqChatRequest<'a> {
 #[derive(Deserialize, Debug)]
 struct GroqChatResponse {
     choices: Vec<GroqChatChoice>,
+    usage: Option<GroqUsage>,
+}
+
+#[derive(Deserialize, Debug)]
+struct GroqUsage {
+    prompt_tokens: u32,
+    completion_tokens: u32,
+    total_tokens: u32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -85,6 +93,14 @@ impl ChatResponse for GroqChatResponse {
 
     fn tool_calls(&self) -> Option<Vec<ToolCall>> {
         todo!()
+    }
+
+    fn usage(&self) -> Option<Usage> {
+        self.usage.as_ref().map(|u| Usage {
+            prompt_tokens: u.prompt_tokens,
+            completion_tokens: u.completion_tokens,
+            total_tokens: u.total_tokens,
+        })
     }
 }
 

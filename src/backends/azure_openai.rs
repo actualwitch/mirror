@@ -15,7 +15,7 @@ use crate::{
     LLMProvider,
 };
 use crate::{
-    chat::{ChatResponse, ToolChoice},
+    chat::{ChatResponse, ToolChoice, Usage},
     FunctionCall, ToolCall,
 };
 use async_trait::async_trait;
@@ -195,6 +195,15 @@ struct AzureOpenAIChatRequest<'a> {
 #[derive(Deserialize, Debug)]
 struct AzureOpenAIChatResponse {
     choices: Vec<AzureOpenAIChatChoice>,
+    usage: Option<AzureOpenAIUsage>,
+}
+
+/// Usage information from Azure OpenAI's API response
+#[derive(Deserialize, Debug)]
+struct AzureOpenAIUsage {
+    prompt_tokens: u32,
+    completion_tokens: u32,
+    total_tokens: u32,
 }
 
 /// Individual choice within an OpenAI chat API response.
@@ -285,6 +294,14 @@ impl ChatResponse for AzureOpenAIChatResponse {
         self.choices
             .first()
             .and_then(|c| c.message.tool_calls.clone())
+    }
+
+    fn usage(&self) -> Option<Usage> {
+        self.usage.as_ref().map(|u| Usage {
+            prompt_tokens: u.prompt_tokens,
+            completion_tokens: u.completion_tokens,
+            total_tokens: u.total_tokens,
+        })
     }
 }
 

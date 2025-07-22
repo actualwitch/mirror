@@ -237,10 +237,24 @@ impl Serialize for ToolChoice {
     }
 }
 
+/// Token usage information for a chat response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Usage {
+    /// Number of tokens in the prompt
+    pub prompt_tokens: u32,
+    /// Number of tokens in the completion/response
+    pub completion_tokens: u32,
+    /// Total tokens used (prompt + completion)
+    pub total_tokens: u32,
+}
+
 pub trait ChatResponse: std::fmt::Debug + std::fmt::Display {
     fn text(&self) -> Option<String>;
     fn tool_calls(&self) -> Option<Vec<ToolCall>>;
     fn thinking(&self) -> Option<String> {
+        None
+    }
+    fn usage(&self) -> Option<Usage> {
         None
     }
 }

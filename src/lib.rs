@@ -16,7 +16,7 @@
 // Re-export for convenience
 pub use async_trait::async_trait;
 
-use chat::Tool;
+use chat::{Tool};
 use serde::{Deserialize, Serialize};
 
 /// Backend implementations for supported LLM providers like OpenAI, Anthropic, etc.

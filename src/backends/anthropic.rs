@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use crate::{
     builder::LLMBackend,
-    chat::{ChatMessage, ChatProvider, ChatResponse, ChatRole, MessageType, Tool, ToolChoice},
+    chat::{ChatMessage, ChatProvider, ChatResponse, ChatRole, MessageType, Tool, ToolChoice, Usage},
     completion::{CompletionProvider, CompletionRequest, CompletionResponse},
     embedding::EmbeddingProvider,
     error::LLMError,
@@ -134,6 +134,14 @@ struct ImageSource<'a> {
 #[derive(Deserialize, Debug)]
 struct AnthropicCompleteResponse {
     content: Vec<AnthropicContent>,
+    usage: Option<AnthropicUsage>,
+}
+
+/// Usage information from Anthropic's API response
+#[derive(Deserialize, Debug)]
+struct AnthropicUsage {
+    input_tokens: u32,
+    output_tokens: u32,
 }
 
 /// Content block within an Anthropic API response.
@@ -243,6 +251,14 @@ impl ChatResponse for AnthropicCompleteResponse {
             v if v.is_empty() => None,
             v => Some(v),
         }
+    }
+
+    fn usage(&self) -> Option<Usage> {
+        self.usage.as_ref().map(|u| Usage {
+            prompt_tokens: u.input_tokens,
+            completion_tokens: u.output_tokens,
+            total_tokens: u.input_tokens + u.output_tokens,
+        })
     }
 }
 
