@@ -15,7 +15,7 @@ use env_logger;
 /// Command line arguments for the LLM CLI
 #[derive(Parser)]
 #[clap(
-    name = "llm",
+    name = "mirror",
     about = "Interactive CLI interface for chatting with LLM providers",
     allow_hyphen_values = true
 )]
@@ -218,7 +218,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("{} Secret '{}' has been set.", "✓".bright_green(), key);
                     return Ok(());
                 }
-                eprintln!("{} Usage: llm set <key> <value>", "Error:".bright_red());
+                eprintln!("{} Usage: mirror set <key> <value>", "Error:".bright_red());
                 return Ok(());
             }
             "get" => {
@@ -230,7 +230,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     return Ok(());
                 }
-                eprintln!("{} Usage: llm get <key>", "Error:".bright_red());
+                eprintln!("{} Usage: mirror get <key>", "Error:".bright_red());
                 return Ok(());
             }
             "delete" => {
@@ -240,7 +240,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("{} Secret '{}' has been deleted.", "✓".bright_green(), key);
                     return Ok(());
                 }
-                eprintln!("{} Usage: llm delete <key>", "Error:".bright_red());
+                eprintln!("{} Usage: mirror delete <key>", "Error:".bright_red());
                 return Ok(());
             }
             "chat" => {}
@@ -258,7 +258,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     return Ok(());
                 }
                 eprintln!(
-                    "{} Usage: llm default <provider:model>",
+                    "{} Usage: mirror default <provider:model>",
                     "Error:".bright_red()
                 );
                 return Ok(());
@@ -268,7 +268,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let (provider_name, model_name) = get_provider_info(&args)
-        .ok_or("No provider specified. Use --provider, provider:model argument, or set a default provider with 'llm default <provider:model>'")?;
+        .ok_or("No provider specified. Use --provider, provider:model argument, or set a default provider with 'mirror default <provider:model>'")?;
 
     let backend =
         LLMBackend::from_str(&provider_name).map_err(|e| format!("Invalid provider: {e}"))?;
@@ -330,7 +330,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    println!("{}", "llm - Interactive Chat".bright_cyan());
+    println!("{}", "mirror - Interactive Chat".bright_cyan());
     println!("Provider: {}", provider_name.bright_green());
     println!("{}", "Type 'exit' to quit".bright_black());
     println!("{}", "─".repeat(50).bright_black());

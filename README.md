@@ -1,8 +1,6 @@
-# LLM
+# 🪞 Mirror
 
-> **Note**: This crate name previously belonged to another project. The current implementation represents a new and different library. The previous crate is now archived and will not receive any updates. **ref: https://github.com/rustformers/llm**
-
-**LLM** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), and [ElevenLabs](https://elevenlabs.io).
+**Mirror** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), and [ElevenLabs](https://elevenlabs.io).
 With a **unified API** and **builder style** - similar to the Stripe experience - you can easily create **chat**, text **completion**, speak-to-text requests without multiplying structures and crates.
 
 ## Key Features
@@ -29,23 +27,23 @@ With a **unified API** and **builder style** - similar to the Stripe experience 
 
 ## Use any LLM backend on your project
 
-Simply add **LLM** to your `Cargo.toml`:
+Simply add **mirror** to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-llm = { version = "0.1.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "Elevenlabs"] }
+mirror = { version = "0.1.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "Elevenlabs"] }
 ```
 
 ## Use any LLM on cli
 
-LLM includes a command-line tool for easily interacting with different LLM models. You can install it with: ```cargo install mirror```
+Mirror includes a command-line tool for easily interacting with different LLM models. You can install it with: ```cargo install mirror```
 
-- Use `llm` to start an interactive chat session
-- Use `llm openai:gpt-4o` to start an interactive chat session with provider:model
-- Use `llm set OPENAI_API_KEY your_key` to configure your API key
-- Use `llm default openai:gpt-4` to set a default provider
-- Use `echo "Hello World" | llm` to pipe
-- Use `llm --provider openai --model gpt-4 --temperature 0.7` for advanced options
+- Use `mirror` to start an interactive chat session
+- Use `mirror openai:gpt-4o` to start an interactive chat session with provider:model
+- Use `mirror set OPENAI_API_KEY your_key` to configure your API key
+- Use `mirror default openai:gpt-4` to set a default provider
+- Use `echo "Hello World" | mirror` to pipe
+- Use `mirror --provider openai --model gpt-4 --temperature 0.7` for advanced options
 
 ## Serving any LLM backend as a REST API
 - Use standard messages format
@@ -54,7 +52,7 @@ LLM includes a command-line tool for easily interacting with different LLM model
 
 ```shell
 [dependencies]
-llm = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "api", "elevenlabs"] }
+mirror = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "api", "elevenlabs"] }
 ```
 
 More details in the [`api_example`](examples/api_example.rs)
