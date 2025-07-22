@@ -1,6 +1,6 @@
 [package]
 name = "mirror"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.85.0"
 description = "A Rust library unifying multiple LLM backends."
@@ -30,6 +30,7 @@ full = [
     "elevenlabs",
     "agent",
     "cohere",
+    "mistral",
 ]
 openai = []
 anthropic = []
@@ -40,6 +41,7 @@ google = []
 groq = []
 azure_openai = []
 cohere = []
+mistral = []
 cli = ["full", "dep:clap", "dep:rustyline", "dep:colored", "dep:spinners"]
 api = ["dep:axum", "dep:tower-http", "dep:uuid"]
 elevenlabs = []

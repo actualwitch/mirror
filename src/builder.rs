@@ -43,6 +43,8 @@ pub enum LLMBackend {
     ElevenLabs,
     /// Cohere API provider
     Cohere,
+    /// Mistral API provider
+    Mistral,
 }
 
 /// Implements string parsing for LLMBackend enum.
@@ -86,6 +88,7 @@ impl std::str::FromStr for LLMBackend {
             "azure-openai" => Ok(LLMBackend::AzureOpenAI),
             "elevenlabs" => Ok(LLMBackend::ElevenLabs),
             "cohere" => Ok(LLMBackend::Cohere),
+            "mistral" => Ok(LLMBackend::Mistral),
             _ => Err(LLMError::InvalidRequest(format!(
                 "Unknown LLM backend: {s}"
             ))),
@@ -804,6 +807,35 @@ impl LLMBuilder {
                         self.json_schema,
                     )?;
                     Box::new(cohere)
+                }
+            }
+            LLMBackend::Mistral => {
+                #[cfg(not(feature = "mistral"))]
+                return Err(LLMError::InvalidRequest(
+                    "Mistral feature not enabled".to_string(),
+                ));
+                #[cfg(feature = "mistral")]
+                {
+                    let api_key = self.api_key.ok_or_else(|| {
+                        LLMError::InvalidRequest("No API key provided for Mistral".to_string())
+                    })?;
+                    let mistral = crate::backends::mistral::Mistral::new(
+                        api_key,
+                        self.base_url,
+                        self.model,
+                        self.max_tokens,
+                        self.temperature,
+                        self.timeout_seconds,
+                        self.system,
+                        self.stream,
+                        self.top_p,
+                        self.embedding_encoding_format,
+                        self.embedding_dimensions,
+                        tools,
+                        self.tool_choice,
+                        self.json_schema,
+                    )?;
+                    Box::new(mistral)
                 }
             }
             LLMBackend::AzureOpenAI => {

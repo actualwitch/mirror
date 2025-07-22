@@ -1,11 +1,11 @@
 # 🪞 Mirror
 
-**Mirror** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), and [ElevenLabs](https://elevenlabs.io).
+**Mirror** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), [Mistral](https://mistral.ai), and [ElevenLabs](https://elevenlabs.io).
 With a **unified API** and **builder style** - similar to the Stripe experience - you can easily create **chat**, text **completion**, speak-to-text requests without multiplying structures and crates.
 
 ## Key Features
 
-- **Multi-backend**: Manage OpenAI, Anthropic, Ollama, DeepSeek, Phind, Groq, Cohere, Elevenlabs and Google through a single entry point.
+- **Multi-backend**: Manage OpenAI, Anthropic, Ollama, DeepSeek, Phind, Groq, Cohere, Mistral, Elevenlabs and Google through a single entry point.
 - **Multi-step chains**: Create multi-step chains with different backends at each step.
 - **Templates**: Use templates to create complex prompts with variables.
 - **Builder pattern**: Configure your LLM (model, temperature, max_tokens, timeouts...) with a few simple calls.
@@ -31,7 +31,7 @@ Simply add **mirror** to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-mirror = { version = "0.1.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "Elevenlabs"] }
+mirror = { version = "0.4.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "mistral", "Elevenlabs"] }
 ```
 
 ## Use any LLM on cli
@@ -50,9 +50,9 @@ Mirror includes a command-line tool for easily interacting with different LLM mo
 - Use step chains to chain multiple LLM backends together
 - Expose the chain through a REST API with openai standard format
 
-```shell
+```toml
 [dependencies]
-mirror = { version = "1.2.4", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "api", "elevenlabs"] }
+mirror = { version = "0.4.0", features = ["openai", "anthropic", "ollama", "deepseek", "phind", "google", "groq", "api", "elevenlabs"] }
 ```
 
 More details in the [`api_example`](examples/api_example.rs)

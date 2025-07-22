@@ -18,8 +18,10 @@ pub const MESSAGE_TYPE_FUNCTION: &str = "function";
 // Default values
 pub const DEFAULT_OPENAI_BASE_URL: &str = "https://api.openai.com/v1/";
 pub const DEFAULT_COHERE_BASE_URL: &str = "https://api.cohere.ai/compatibility/v1/";
+pub const DEFAULT_MISTRAL_BASE_URL: &str = "https://api.mistral.ai/v1/";
 pub const DEFAULT_OPENAI_MODEL: &str = "gpt-4.1";
 pub const DEFAULT_COHERE_MODEL: &str = "command-light";
+pub const DEFAULT_MISTRAL_MODEL: &str = "mistral-small-latest";
 
 // Model prefixes for compatibility checking
 pub const REASONING_MODEL_PREFIXES: &[&str] = &[
