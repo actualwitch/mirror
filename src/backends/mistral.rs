@@ -20,7 +20,7 @@ use crate::{
 };
 use crate::{
     chat::{ChatResponse, ToolChoice, Usage},
-    ToolCall,
+    FunctionCall, ToolCall,
 };
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -158,7 +158,27 @@ struct MistralChatMsg {
     #[allow(dead_code)]
     role: String,
     content: Option<String>,
-    tool_calls: Option<Vec<ToolCall>>,
+    tool_calls: Option<Vec<MistralToolCall>>,
+}
+
+/// Mistral-specific tool call structure for deserialization
+#[derive(Deserialize, Debug)]
+struct MistralToolCall {
+    id: String,
+    #[serde(rename = "type", default = "default_tool_type")]
+    call_type: Option<String>,
+    function: MistralToolFunction,
+}
+
+/// Mistral-specific function structure for deserialization
+#[derive(Deserialize, Debug)]
+struct MistralToolFunction {
+    name: String,
+    arguments: String,
+}
+
+fn default_tool_type() -> Option<String> {
+    Some("function".to_string())
 }
 
 #[derive(Deserialize, Debug)]
@@ -229,7 +249,20 @@ impl ChatResponse for MistralChatResponse {
     fn tool_calls(&self) -> Option<Vec<ToolCall>> {
         self.choices
             .first()
-            .and_then(|c| c.message.tool_calls.clone())
+            .and_then(|c| c.message.tool_calls.as_ref())
+            .map(|mistral_calls| {
+                mistral_calls
+                    .iter()
+                    .map(|tc| ToolCall {
+                        id: tc.id.clone(),
+                        call_type: tc.call_type.clone().unwrap_or_else(|| "function".to_string()),
+                        function: FunctionCall {
+                            name: tc.function.name.clone(),
+                            arguments: tc.function.arguments.clone(),
+                        },
+                    })
+                    .collect()
+            })
     }
 
     fn usage(&self) -> Option<Usage> {
@@ -248,9 +281,24 @@ impl std::fmt::Display for MistralChatResponse {
             None => return write!(f, "{}", ERR_NO_RESPONSE_CHOICES),
         };
         
+        // Convert Mistral tool calls to generic format for display
+        let converted_tool_calls = first_choice.message.tool_calls.as_ref().map(|calls| {
+            calls
+                .iter()
+                .map(|tc| ToolCall {
+                    id: tc.id.clone(),
+                    call_type: tc.call_type.clone().unwrap_or_else(|| "function".to_string()),
+                    function: FunctionCall {
+                        name: tc.function.name.clone(),
+                        arguments: tc.function.arguments.clone(),
+                    },
+                })
+                .collect::<Vec<_>>()
+        });
+        
         match (
             &first_choice.message.content,
-            &first_choice.message.tool_calls,
+            &converted_tool_calls,
         ) {
             (Some(content), Some(tool_calls)) => {
                 for tool_call in tool_calls {

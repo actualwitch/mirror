@@ -1,4 +1,4 @@
-# 🪞 Mirror
+# 🪞✨ Mirror
 
 **Mirror** is a **Rust** library that lets you use **multiple LLM backends** in a single project: [OpenAI](https://openai.com), [Anthropic (Claude)](https://www.anthropic.com), [Ollama](https://github.com/ollama/ollama), [DeepSeek](https://www.deepseek.com), [Phind](https://www.phind.com), [Groq](https://www.groq.com), [Google](https://cloud.google.com/gemini), [Cohere](https://cohere.com), [Mistral](https://mistral.ai), and [ElevenLabs](https://elevenlabs.io).
 With a **unified API** and **builder style** - similar to the Stripe experience - you can easily create **chat**, text **completion**, speak-to-text requests without multiplying structures and crates.
